@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<!-- Liviu Radu, 041-290-873 | Assignment 3 - Frontend -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Food Products</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 16px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #f2f2f2; }
+    #message { color: #b00020; }
+    footer { margin-top: 32px; font-size: 0.85em; color: #555; }
+  </style>
+</head>
+<body>
+  <h1>Food Products</h1>
+  <p id="message"></p>
+
+  <table>
+    <thead>
+      <tr><th>ID</th><th>Name</th><th>Price</th></tr>
+    </thead>
+    <!-- Rows get added here by the script below -->
+    <tbody id="food-table-body"></tbody>
+  </table>
+
+  <footer>
+    Disclaimer: This app is student work for demonstrating web development skills only.
+  </footer>
+
+  <script>
+    // Grab the table body and the message paragraph from the page
+    const tbody = document.getElementById('food-table-body');
+    const message = document.getElementById('message');
+
+    // Ask the server for all foods, then build one table row per item
+    async function loadFoods() {
+      try {
+        const response = await fetch('/foods');
+        console.log('Response status:', response.status);
+
+        if (!response.ok) {
+          throw new Error('Server returned status ' + response.status);
+        }
+
+        const foods = await response.json();
+        console.log('Foods received:', foods);
+
+        // Clear old rows, then add the new ones (this is the DOM update)
+        tbody.innerHTML = '';
+        foods.forEach((food) => {
+          const row = document.createElement('tr');
+          row.innerHTML =
+            '<td>' + food.id + '</td>' +
+            '<td>' + food.name + '</td>' +
+            '<td>$' + food.price.toFixed(2) + '</td>';
+          tbody.appendChild(row);
+        });
+      } catch (err) {
+        console.error('Could not load foods:', err);
+        message.textContent = 'Could not load foods. Please try again.';
+      }
+    }
+
+    // Run when the page loads
+    loadFoods();
+  </script>
+</body>
+</html>
